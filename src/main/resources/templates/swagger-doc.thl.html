@@ -1,0 +1,241 @@
+<!--
+  #%L
+  Wisdom-Framework
+  %%
+  Copyright (C) 2013 - 2014 Wisdom Framework
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Api documentation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+    <style>
+
+        .mono {
+            font-family: Monaco, 'Lucida Console', monospace;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .resourceUri {
+            font-family: Monaco, 'Lucida Console', monospace;
+        }
+
+        .GET {
+            font-family: Monaco, 'Lucida Console', monospace;
+            background: rgb(35, 146, 247);
+            color: #fff;
+        }
+
+        .POST {
+            font-family: Monaco, 'Lucida Console', monospace;
+            background: rgb(19, 194, 15);
+            color: #fff;
+        }
+
+        .PUT {
+            font-family: Monaco, 'Lucida Console', monospace;
+            background: rgb(255, 144, 0);
+            color: #fff;
+        }
+
+        .DELETE {
+            font-family: Monaco, 'Lucida Console', monospace;
+            background: rgb(227, 0, 18);
+            color: #fff;
+        }
+
+        .inlined {
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        .indented {
+            margin-left: 20px;
+        }
+
+        .type {
+            color: #468847;
+        }
+
+        h1 {
+            margin: 0;
+            background: #2D679C;
+            padding: 20px 45px;
+            color: #fff;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, .3);
+            border-bottom: 1px solid #15A1D8;
+            font-family: Monaco, 'Lucida Console', monospace;
+            font-size: 28px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Api documentation</h1>
+
+<div class="info col-md-8">
+    <h2 class="header"><span th:text="${api.title}">Api title</span>
+        <small class="inlined">(<a th:href="${apiBaseUri} + '/raw'">Download raw file</a>)</small>
+    </h2>
+
+    <div class="mono" th:text="${api.description}">Api description</div>
+
+    <div class="mono bold">Version: <span th:text="${api.version}">Api version</span></div>
+</div>
+
+<div class="resources col-md-8">
+    <h2 class="header">Resources:</h2>
+
+    <div class="panel-group resources" id="resourcesAccordion" role="tablist" aria-multiselectable="true" th:each="resource,iterStat : ${api.resources}">
+        <div class="panel panel-default" >
+            <div class="panel-heading" role="tab">
+                <a data-toggle="collapse" data-parent="#resourcesAccordion" th:href="'#collapse' + ${iterStat.index}" th:aria-controls="'collapse' + ${iterStat.index}" aria-expanded="false">
+                    <span class="resourceUri" th:class="${resource.method}" th:text="${resource.method}">PATH</span>&nbsp;
+                    <span class="resourceUri" th:utext="${resource.uri}">URI</span>&nbsp;&nbsp;
+                    <span class="mono inlined" th:utext="${resource.summary}">SUMMARY</span>
+                    <span class="label label-warning" th:remove="${router.getRouteFor(resource.method, resource.uri).getControllerMethod()} ? all : none">(Not available)</span>
+                </a>
+            </div>
+
+            <div th:id="'collapse' + ${iterStat.index}" class="panel-body panel-collapse collapse">
+                <h4>Description</h4>
+
+                <span th:utext="${resource.description.isPresent()} ? ${resource.description.get()}"/>
+
+                <h4>Security</h4>
+
+                <div th:each="security : ${resource.security}">
+                    <a th:href="'#/security/' + ${security.securityScheme}"><span th:utext="${security.securityScheme}"/></a> : <span th:utext="${security.roles}"/>
+                </div>
+
+                <h4>Parameters</h4>
+
+                <table class="parameters table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Located in</th>
+                        <th>Description</th>
+                        <th>Required</th>
+                        <th>Schema</th>
+                    </tr>
+                    </thead>
+                    <tbody class="parameters" th:each="parameter : ${resource.parameters}">
+                    <tr>
+                        <td><span class="mono" th:utext="${parameter.name}">Name</span></td>
+                        <td><span class="mono" th:utext="${parameter.locatedIn} ?: '(undefined)'">In</span></td>
+                        <td><span class="mono" th:utext="${parameter.description}">Description</span></td>
+                        <td><span class="mono" th:utext="${parameter.required}">Required</span></td>
+                        <td>
+                            <div th:replace="::schemaFragment (${parameter.schema})"></div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <h4>Responses</h4>
+
+                <table class="responses table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Schema</th>
+                    </tr>
+                    </thead>
+                    <tbody class="responses" th:each="response : ${resource.responses}">
+                    <tr>
+                        <td><span class="mono" th:utext="${response.code}">Code</span></td>
+                        <td><span class="mono"
+                                  th:utext="${response.description.isPresent()} ? ${response.description.get()}">Description</span>
+                        </td>
+                        <td>
+                            <div th:remove="${response.schema.isPresent()} ? none : all"
+                                 th:replace="::schemaFragment (${response.schema.get()})"></div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="models col-md-8">
+    <h2 class="header">Models:</h2>
+
+    <div class="models" th:each="schema : ${api.models}">
+        <div class="panel panel-primary">
+            <div class="indented" th:fragment="schemaFragment (schema)">
+                <h3 th:id="${schema.title.isPresent()} ? '/definitions/' + ${schema.title.get()}"
+                    th:remove="${schema.title.isPresent()} ? none : all"
+                    th:text="${schema.title.isPresent()} ? ${schema.title.get()}">Schema title</h3>
+
+                <div class="mono"><span class="bold">Type: </span><span class="type bold"
+                                                                        th:text="${schema.type.value}"></span></div>
+                <div class="mono" th:switch="${schema.type.name()}">
+                    <div th:case="'REF'">
+                        <span class="bold">Ref: </span><a th:href="${schema.reference}"><span
+                            th:text="${schema.reference}">Schema reference</span></a>
+                    </div>
+                    <div th:case="'OBJECT'">
+                        <span>{</span>
+                        <ul class="properties" th:each="property : ${schema.properties}">
+                            <li>
+                                <span th:text="${property.name}">Property name</span>:&nbsp;<span
+                                    th:replace="::schemaFragment (${property.schema})"></span>
+                            </li>
+                        </ul>
+                        <span>}</span>
+                    </div>
+                    <div th:case="'ARRAY'">
+                        <span class="mono bold">Items: </span><span
+                            th:replace="::schemaFragment (${schema.itemsType})"></span>
+                    </div>
+                    <div th:case="*">
+                        <span class="mono" th:remove="${schema.format.isPresent()} ? none : all"><span class="bold">Format: </span><span
+                                th:text="${schema.format.get()}"></span></span>
+                    </div>
+                </div>
+                <div class="mono" th:remove="${schema.description.isPresent()} ? none : all"><span class="bold">Description: </span><span
+                        th:text="${schema.description.get()}"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="security-schemes col-md-8">
+    <h2 class="header">Security schemes:</h2>
+
+    <div class="securitySchemes" th:each="security : ${api.securitySchemes}">
+        <div class="panel">
+            <h3 th:id="'/security/' + ${security.title}" th:text="${security.title}"></h3>
+
+            <div class="mono"><span class="bold">Type: </span><span th:text="${security.type}"></span></div>
+            <div class="mono"><span class="bold">In: </span><span th:text="${security.locatedIn}"></span></div>
+            <div class="mono"><span class="bold">Name: </span><span th:text="${security.name}"></span></div>
+        </div>
+    </div>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
