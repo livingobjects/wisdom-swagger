@@ -21,6 +21,7 @@ package com.livingobjects.wisdom.swagger;
 
 import com.livingobjects.myrddin.ApiSpecification;
 import com.livingobjects.myrddin.Wizard;
+import com.livingobjects.myrddin.exception.SwaggerException;
 import com.livingobjects.wisdom.swagger.impls.BundleApiDoc;
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.ipojo.annotations.Requires;
@@ -37,7 +38,6 @@ import org.wisdom.api.http.Result;
 import org.wisdom.api.router.Router;
 import org.wisdom.api.templates.Template;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -63,7 +63,7 @@ public final class SwaggerDocController extends DefaultController {
     private final ConcurrentHashMap<String, Set<String>> bundleBaseUris = new ConcurrentHashMap<>();
 
     @Route(method = HttpMethod.GET, uri = "/api-doc/{api}")
-    public Result displayDocumentation(@PathParameter("api") String api) throws FileNotFoundException {
+    public Result displayDocumentation(@PathParameter("api") String api) {
         BundleApiDoc apiDoc = baseUriMap.get(api);
         if (apiDoc != null) {
             return ok(render(swaggerDocView, "apiBaseUri", api, "api", apiDoc.apiSpecification, "router", router));
@@ -73,7 +73,7 @@ public final class SwaggerDocController extends DefaultController {
     }
 
     @Route(method = HttpMethod.GET, uri = "/api-doc/{api}/raw")
-    public Result displayRawDocumentation(@PathParameter("api") String api) throws FileNotFoundException {
+    public Result displayRawDocumentation(@PathParameter("api") String api) {
         BundleApiDoc apiDoc = baseUriMap.get(api);
         if (apiDoc != null) {
             URL url = apiDoc.bundle.getResource(apiDoc.swaggerFile);
@@ -105,20 +105,24 @@ public final class SwaggerDocController extends DefaultController {
             try (InputStream in = bundle.getResource(swaggerFile).openStream()) {
                 if (in != null) {
                     Wizard wizard = new Wizard();
-                    ApiSpecification apiSpecification = wizard.generateSpecification(in);
-                    Set<String> baseUris = apiSpecification.resources.stream().map(r -> {
-                        String[] uris = r.uri.split("/");
-                        if (uris.length > 2) {
-                            return uris[1];
-                        } else {
-                            return null;
+                    try {
+                        ApiSpecification apiSpecification = wizard.generateSpecification(in);
+                        Set<String> baseUris = apiSpecification.resources.stream().map(r -> {
+                            String[] uris = r.uri.split("/");
+                            if (uris.length > 2) {
+                                return uris[1];
+                            } else {
+                                return null;
+                            }
+                        }).filter(s -> s != null).collect(Collectors.toSet());
+                        BundleApiDoc apiDoc = new BundleApiDoc(baseUris, swaggerFile, apiSpecification, bundle);
+                        for (String baseUri : baseUris) {
+                            baseUriMap.put(baseUri, apiDoc);
                         }
-                    }).filter(s -> s != null).collect(Collectors.toSet());
-                    BundleApiDoc apiDoc = new BundleApiDoc(baseUris, swaggerFile, apiSpecification, bundle);
-                    for (String baseUri : baseUris) {
-                        baseUriMap.put(baseUri, apiDoc);
+                        bundleBaseUris.put(bundle.getSymbolicName(), baseUris);
+                    } catch (SwaggerException e) {
+                        logger().error("Swagger documentation '{}' for bundle '{}' is invalid.", swaggerFile, bundle.getSymbolicName(), e);
                     }
-                    bundleBaseUris.put(bundle.getSymbolicName(), baseUris);
                 } else {
                     logger().error("Swagger documentation '{}' not found for bundle '{}'. Check Swagger-Doc attribute in manifest.", swaggerFile, bundle.getSymbolicName());
                 }
