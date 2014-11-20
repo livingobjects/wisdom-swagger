@@ -54,7 +54,7 @@ public final class SwaggerDocController extends DefaultController {
 
     @Requires
     protected Router router;
-    
+
     @View("swagger-doc")
     protected Template swaggerDocView;
 
