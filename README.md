@@ -15,7 +15,7 @@ Run maven
 mvn clean install
 ```
 
-To deploy to your local repository use DaltDeploymentRepository option like this :
+To deploy to your local repository use "altDeploymentRepository" option like this :
 
 ```shell
 mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/snapshots
