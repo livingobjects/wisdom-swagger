@@ -7,6 +7,26 @@ A swagger extension for wisdom framework which provides Swagger REST API documen
 
 Wisdom-swagger module is a fully osgi compatible bundle.
 
+## Build
+
+Run maven
+
+```shell
+mvn clean install
+```
+
+To deploy to your local repository use DaltDeploymentRepository option like this :
+
+```shell
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/snapshots
+```
+
+Or to deploy a release:
+
+```shell
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/releases
+```
+
 ## How to use
 
 #### Add wisdom-swagger dependency
