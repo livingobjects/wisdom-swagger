@@ -52,12 +52,15 @@ import java.util.stream.Collectors;
         extension = "Swagger-Doc")
 public final class SwaggerDocController extends DefaultController {
 
-    private final ConcurrentHashMap<String, BundleApiDoc> baseUriMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Set<String>> bundleBaseUris = new ConcurrentHashMap<>();
     @Requires
     protected Router router;
+    
     @View("swagger-doc")
     protected Template swaggerDocView;
+
+    private final ConcurrentHashMap<String, BundleApiDoc> baseUriMap = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String, Set<String>> bundleBaseUris = new ConcurrentHashMap<>();
 
     @Route(method = HttpMethod.GET, uri = "/api-doc/{api}")
     public Result displayDocumentation(@PathParameter("api") String api) throws FileNotFoundException {
@@ -91,8 +94,8 @@ public final class SwaggerDocController extends DefaultController {
     }
 
     /**
-     * Notified when a bundle is loaded with a given Swagger-Doc header in its manifest. It must conteins the header to be loaded by SwaggerDocController.
-     * Read the swagger file containes in the header. Serves all the base routes defined in the documentation to diaplay the documentation.
+     * Notified when a bundle is loaded with a given Swagger-Doc header in its manifest. It must contains the header to be loaded by SwaggerDocController.
+     * Read the swagger file contained in the header. Serves all the base routes defined in the documentation to display the documentation.
      *
      * @param bundle      The new loaded bundle.
      * @param swaggerFile The swaggerFile path in the manifest.
@@ -105,8 +108,8 @@ public final class SwaggerDocController extends DefaultController {
                     ApiSpecification apiSpecification = wizard.generateSpecification(in);
                     Set<String> baseUris = apiSpecification.resources.stream().map(r -> {
                         String[] uris = r.uri.split("/");
-                        if (uris.length > 0) {
-                            return uris[0];
+                        if (uris.length > 2) {
+                            return uris[1];
                         } else {
                             return null;
                         }
@@ -128,7 +131,7 @@ public final class SwaggerDocController extends DefaultController {
     }
 
     /**
-     * Notified when a gievn bundle is unloaded. Clear the corresponding uris stored in the maps.
+     * Notified when a given bundle is unloaded. Clear the corresponding uris stored in the maps.
      *
      * @param bundle The unloaded bundle.
      */
