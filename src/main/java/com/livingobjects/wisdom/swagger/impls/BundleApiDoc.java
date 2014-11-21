@@ -1,13 +1,12 @@
 package com.livingobjects.wisdom.swagger.impls;
 
+import com.google.common.collect.ImmutableSet;
 import com.livingobjects.myrddin.ApiSpecification;
 import org.osgi.framework.Bundle;
 
-import java.util.Set;
-
 public final class BundleApiDoc {
 
-    public final Set<String> baseUris;
+    public final ImmutableSet<String> baseUris;
 
     public final String swaggerFile;
 
@@ -15,7 +14,7 @@ public final class BundleApiDoc {
 
     public final Bundle bundle;
 
-    public BundleApiDoc(Set<String> baseUris, String swaggerFile, ApiSpecification apiSpecification, Bundle bundle) {
+    public BundleApiDoc(ImmutableSet<String> baseUris, String swaggerFile, ApiSpecification apiSpecification, Bundle bundle) {
         this.baseUris = baseUris;
         this.swaggerFile = swaggerFile;
         this.apiSpecification = apiSpecification;

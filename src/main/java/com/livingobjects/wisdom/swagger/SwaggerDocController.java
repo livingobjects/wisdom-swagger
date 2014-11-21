@@ -19,6 +19,7 @@
  */
 package com.livingobjects.wisdom.swagger;
 
+import com.google.common.collect.ImmutableSet;
 import com.livingobjects.myrddin.ApiSpecification;
 import com.livingobjects.myrddin.Wizard;
 import com.livingobjects.myrddin.exception.SwaggerException;
@@ -60,7 +61,7 @@ public final class SwaggerDocController extends DefaultController {
 
     private final ConcurrentHashMap<String, BundleApiDoc> baseUriMap = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String, Set<String>> bundleBaseUris = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ImmutableSet<String>> bundleBaseUris = new ConcurrentHashMap<>();
 
     @Route(method = HttpMethod.GET, uri = "/api-doc/{api}")
     public Result displayDocumentation(@PathParameter("api") String api) {
@@ -115,11 +116,12 @@ public final class SwaggerDocController extends DefaultController {
                                 return null;
                             }
                         }).filter(s -> s != null).collect(Collectors.toSet());
-                        BundleApiDoc apiDoc = new BundleApiDoc(baseUris, swaggerFile, apiSpecification, bundle);
+                        ImmutableSet<String> immutableBaseUris = ImmutableSet.of();
+                        BundleApiDoc apiDoc = new BundleApiDoc(immutableBaseUris, swaggerFile, apiSpecification, bundle);
                         for (String baseUri : baseUris) {
                             baseUriMap.put(baseUri, apiDoc);
                         }
-                        bundleBaseUris.put(bundle.getSymbolicName(), baseUris);
+                        bundleBaseUris.put(bundle.getSymbolicName(), immutableBaseUris);
                     } catch (SwaggerException e) {
                         logger().error("Swagger documentation '{}' for bundle '{}' is invalid.", swaggerFile, bundle.getSymbolicName(), e);
                     }
