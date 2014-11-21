@@ -1,13 +1,13 @@
 wisdom-swagger
 ==============
 
-A swagger extension for wisdom framework which provides Swagger REST API documentation automatically.
+A swagger extension for wisdom framework which provides Swagger REST API documentation automatically (<a href="https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md">Swagger spec v2.0</a>).
 
 ## Why wisdom-swagger ?
 
 This module is done to be deployed automatically to your wisdom application. It is fully OSGi compatible and dependencies are minimal (myrddin, snakeyaml).
 
-This module is automatically notified by all the OSGi modules which declares a "Swagger-Doc" attribute in their MANIFEST.MF and provides the corresponding Swagger file in YAML Swagger 2.0 format.
+This module is automatically notified by all the OSGi modules which declares a "Swagger-Doc" attribute in their MANIFEST.MF and provides the corresponding Swagger file in <a href="https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md">YAML Swagger 2.0 format</a>.
 
 When a bundle with a valid Swagger-Doc is found, wisdom-swagger will parse automatically the Swagger documentation and serve:
 - an HTML page which display the REST API documentation as a styled UI.
