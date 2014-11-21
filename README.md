@@ -15,6 +15,26 @@ When a bundle with a valid Swagger-Doc is found, wisdom-swagger will parse autom
 
 See details below for the routes created by wisdom-swagger.
 
+## Build
+
+Run maven
+
+```shell
+mvn clean install
+```
+
+To deploy to your local repository use "altDeploymentRepository" option like this :
+
+```shell
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/snapshots
+```
+
+Or to deploy a release:
+
+```shell
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/releases
+```
+
 ## How to use
 
 #### Add wisdom-swagger dependency
@@ -30,7 +50,7 @@ src/main/resources/swagger/api.yaml
 
 See example on Swagger 2.0 format on http://editor.swagger.io/
 
-#### Declare your Swagger doc into your manifest
+#### Declare your Swagger doc to wisdom-swagger
 
 Into your wisdom application add Swagger-Doc attribute in the manifest pointing to the swagger file.
 Example of MANIFEST.MF :
@@ -40,9 +60,9 @@ Private-Package: com.livingobjects.mywisdom
 Swagger-Doc: swagger/api.yaml
 ```
 
-Wisdom-swagger will be automatically notified at runtime by the manifest attribute and will serve the API documentation.
+Wisdom-swagger will be automatically notified at runtime by the manifest attrbiute and will server the documentation.
 
-It will read all the base uris of the routes defined into the Swagger documentation and serve the documentation page for these uris.
+It will read all the base uris routes defined into your Swagger documentation and serve a page for these uris.
 
 Example:
 
@@ -64,7 +84,5 @@ The following urls will be served:
  http://localhost:9000/api-doc/route1/raw
 
  http://localhost:9000/api-doc/route2/raw
-
-Another example:
 
 
