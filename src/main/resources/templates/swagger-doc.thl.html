@@ -170,8 +170,9 @@
                                   th:utext="${response.description.isPresent()} ? ${response.description.get()}">Description</span>
                         </td>
                         <td>
-                            <div th:remove="${response.schema.isPresent()} ? none : all"
-                                 th:replace="::schemaFragment (${response.schema.get()})"></div>
+                            <div th:remove="${response.schema.isPresent()} ? none : all">
+                               <div th:replace="::schemaFragment (${response.schema.get()})"></div>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
