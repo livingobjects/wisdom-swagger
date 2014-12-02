@@ -1,8 +1,8 @@
 /*
  * #%L
- * Wisdom-Framework
+ * Wisdom-Swagger
  * %%
- * Copyright (C) 2013 - 2014 Wisdom Framework
+ * Copyright (C) 2014 LivingObjects SAS
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
