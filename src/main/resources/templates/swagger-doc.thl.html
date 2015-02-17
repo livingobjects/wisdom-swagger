@@ -1,22 +1,3 @@
-<!--
-  #%L
-  Wisdom-Framework
-  %%
-  Copyright (C) 2013 - 2014 Wisdom Framework
-  %%
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-  #L%
-  -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -102,14 +83,17 @@
 <div class="resources col-md-8">
     <h2 class="header">Resources:</h2>
 
-    <div class="panel-group resources" id="resourcesAccordion" role="tablist" aria-multiselectable="true" th:each="resource,iterStat : ${api.resources}">
-        <div class="panel panel-default" >
+    <div class="panel-group resources" id="resourcesAccordion" role="tablist" aria-multiselectable="true"
+         th:each="resource,iterStat : ${api.resources}">
+        <div class="panel panel-default">
             <div class="panel-heading" role="tab">
-                <a data-toggle="collapse" data-parent="#resourcesAccordion" th:href="'#collapse' + ${iterStat.index}" th:aria-controls="'collapse' + ${iterStat.index}" aria-expanded="false">
+                <a data-toggle="collapse" data-parent="#resourcesAccordion" th:href="'#collapse' + ${iterStat.index}"
+                   th:aria-controls="'collapse' + ${iterStat.index}" aria-expanded="false">
                     <span class="resourceUri" th:class="${resource.method}" th:text="${resource.method}">PATH</span>&nbsp;
                     <span class="resourceUri" th:utext="${resource.uri}">URI</span>&nbsp;&nbsp;
                     <span class="mono inlined" th:utext="${resource.summary}">SUMMARY</span>
-                    <span class="label label-warning" th:remove="${router.getRouteFor(resource.method, resource.uri).getControllerMethod()} ? all : none">(Not available)</span>
+                    <span class="label label-warning"
+                          th:remove="${router.getRouteFor(resource.method, resource.uri).getControllerMethod()} ? all : none">(Not available)</span>
                 </a>
             </div>
 
@@ -121,7 +105,8 @@
                 <h4>Security</h4>
 
                 <div th:each="security : ${resource.security}">
-                    <a th:href="'#/security/' + ${security.securityScheme}"><span th:utext="${security.securityScheme}"/></a> : <span th:utext="${security.roles}"/>
+                    <a th:href="'#/security/' + ${security.securityScheme}"><span
+                            th:utext="${security.securityScheme}"/></a> : <span th:utext="${security.roles}"/>
                 </div>
 
                 <h4>Parameters</h4>
@@ -166,8 +151,9 @@
                                   th:utext="${response.description.isPresent()} ? ${response.description.get()}">Description</span>
                         </td>
                         <td>
-                            <div th:remove="${response.schema.isPresent()} ? none : all"
-                                 th:replace="::schemaFragment (${response.schema.get()})"></div>
+                            <div th:remove="${response.schema.isPresent()} ? none : all">
+                               <div th:replace="::schemaFragment (${response.schema.get()})"></div>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -177,44 +163,88 @@
     </div>
 </div>
 
-<div class="models col-md-8">
+<div class="definitions col-md-8">
     <h2 class="header">Models:</h2>
 
-    <div class="models" th:each="schema : ${api.models}">
-        <div class="panel panel-primary">
-            <div class="indented" th:fragment="schemaFragment (schema)">
-                <h3 th:id="${schema.title.isPresent()} ? '/definitions/' + ${schema.title.get()}"
-                    th:remove="${schema.title.isPresent()} ? none : all"
-                    th:text="${schema.title.isPresent()} ? ${schema.title.get()}">Schema title</h3>
+    <div class="definitions panel panel-primary" th:each="schema : ${api.definitions}">
+        <div class="indented" th:fragment="schemaFragment (schema)">
+            <h3 th:id="${schema.title.isPresent()} ? '/definitions/' + ${schema.title.get()}"
+                th:remove="${schema.title.isPresent()} ? none : all"
+                th:text="${schema.title.isPresent()} ? ${schema.title.get()}">Schema title</h3>
 
-                <div class="mono"><span class="bold">Type: </span><span class="type bold"
-                                                                        th:text="${schema.type.value}"></span></div>
-                <div class="mono" th:switch="${schema.type.name()}">
-                    <div th:case="'REF'">
-                        <span class="bold">Ref: </span><a th:href="${schema.reference}"><span
-                            th:text="${schema.reference}">Schema reference</span></a>
-                    </div>
-                    <div th:case="'OBJECT'">
-                        <span>{</span>
-                        <ul class="properties" th:each="property : ${schema.properties}">
-                            <li>
-                                <span th:text="${property.name}">Property name</span>:&nbsp;<span
-                                    th:replace="::schemaFragment (${property.schema})"></span>
-                            </li>
-                        </ul>
-                        <span>}</span>
-                    </div>
-                    <div th:case="'ARRAY'">
-                        <span class="mono bold">Items: </span><span
-                            th:replace="::schemaFragment (${schema.itemsType})"></span>
-                    </div>
-                    <div th:case="*">
-                        <span class="mono" th:remove="${schema.format.isPresent()} ? none : all"><span class="bold">Format: </span><span
-                                th:text="${schema.format.get()}"></span></span>
-                    </div>
+            <div class="mono"><span class="bold">Type: </span><span class="type bold" th:text="${schema.type.value}"></span></div>
+            <div class="mono" th:remove="${schema.description.isPresent()} ? none : all"><span class="bold">Description: </span><span th:text="${schema.description.get()}"></span></div>
+
+            <div class="mono" th:switch="${schema.type.name()}">
+                <div th:case="'ONE_OF'">
+                    <ul th:each="oneOfType : ${schema.types}">
+                        <li>
+                            <span th:replace="::schemaFragment (${oneOfType})"></span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="mono" th:remove="${schema.description.isPresent()} ? none : all"><span class="bold">Description: </span><span
-                        th:text="${schema.description.get()}"></span></div>
+                <div th:case="'ANY_OF'">
+                    <ul th:each="anyOfType : ${schema.types}">
+                        <li>
+                            <span th:replace="::schemaFragment (${anyOfType})"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div th:case="'REF'">
+                    <span class="bold">Ref: </span><a th:href="${schema.reference}"><span
+                        th:text="${schema.reference}">Schema reference</span></a>
+                </div>
+                <div th:case="'OBJECT'">
+                    <span>{</span>
+                    <ul class="properties" th:each="property : ${schema.properties}">
+                        <li>
+                            <span th:text="${property.name}">Property name<span
+                                        th:remove="${schema.required.contains(property.name)} ? none : all"> (required)</span></span>:&nbsp;
+                            <span th:replace="::schemaFragment (${property.schema})"></span>
+                        </li>
+                    </ul>
+                    <span>}</span>
+                </div>
+                <div th:case="'ARRAY'">
+                    <span class="mono bold">Items: </span><span
+                        th:replace="::schemaFragment (${schema.itemsType})"></span>
+                </div>
+                <div th:case="'STRING'">
+                    <span class="mono" th:remove="${schema.format.isPresent()} ? none : all">
+                        <span class="bold">Format: </span><span th:text="${schema.format.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.enumeration.isPresent()} ? none : all">
+                        <span class="bold">Enum: </span><span th:text="${schema.enumeration.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.pattern.isPresent()} ? none : all">
+                        <span class="bold">Pattern: </span><span th:text="${schema.pattern.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.minLength.isPresent()} ? none : all">
+                        <span class="bold">MinLength: </span><span th:text="${schema.minLength.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.maxLength.isPresent()} ? none : all">
+                        <span class="bold">MaxLength: </span><span th:text="${schema.maxLength.get()}"></span>
+                    </span>
+                </div>
+                <div th:case="'BOOLEAN'">
+                </div>
+                <div th:case="*"> <!-- NUMBER, INTEGER -->
+                    <span class="mono" th:remove="${schema.format.isPresent()} ? none : all">
+                        <span class="bold">Format: </span><span th:text="${schema.format.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.enumeration.isPresent()} ? none : all">
+                        <span class="bold">Enum: </span><span th:text="${schema.enumeration.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.multipleOf.isPresent()} ? none : all">
+                        <span class="bold">MultipleOf: </span><span th:text="${schema.multipleOf.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.minimum.isPresent()} ? none : all">
+                        <span class="bold">Minimum: </span><span th:text="${schema.minimum.get()}"></span>
+                    </span>
+                    <span class="mono" th:remove="${schema.maximum.isPresent()} ? none : all">
+                        <span class="bold">Maximum: </span><span th:text="${schema.maximum.get()}"></span>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -223,14 +253,12 @@
 <div class="security-schemes col-md-8">
     <h2 class="header">Security schemes:</h2>
 
-    <div class="securitySchemes" th:each="security : ${api.securitySchemes}">
-        <div class="panel">
-            <h3 th:id="'/security/' + ${security.title}" th:text="${security.title}"></h3>
+    <div class="securitySchemes panel panel-primary" th:each="security : ${api.securitySchemes}">
+        <h3 th:id="'/security/' + ${security.title}" th:text="${security.title}"></h3>
 
-            <div class="mono"><span class="bold">Type: </span><span th:text="${security.type}"></span></div>
-            <div class="mono"><span class="bold">In: </span><span th:text="${security.locatedIn}"></span></div>
-            <div class="mono"><span class="bold">Name: </span><span th:text="${security.name}"></span></div>
-        </div>
+        <div class="mono"><span class="bold">Type: </span><span th:text="${security.type}"></span></div>
+        <div class="mono"><span class="bold">In: </span><span th:text="${security.locatedIn}"></span></div>
+        <div class="mono"><span class="bold">Name: </span><span th:text="${security.name}"></span></div>
     </div>
 </div>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

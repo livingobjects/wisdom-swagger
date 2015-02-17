@@ -1,8 +1,8 @@
 /*
  * #%L
- * Wisdom-Framework
+ * Wisdom-Swagger
  * %%
- * Copyright (C) 2013 - 2014 Wisdom Framework
+ * Copyright (C) 2014 LivingObjects SAS
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,15 +53,19 @@ import java.util.stream.Collectors;
         extension = "Swagger-Doc")
 public final class SwaggerDocController extends DefaultController {
 
+    private final ConcurrentHashMap<String, BundleApiDoc> baseUriMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ImmutableSet<String>> bundleBaseUris = new ConcurrentHashMap<>();
     @Requires
     protected Router router;
-
     @View("swagger-doc")
     protected Template swaggerDocView;
+    @View("swagger-index")
+    protected Template swaggerIndexView;
 
-    private final ConcurrentHashMap<String, BundleApiDoc> baseUriMap = new ConcurrentHashMap<>();
-
-    private final ConcurrentHashMap<String, ImmutableSet<String>> bundleBaseUris = new ConcurrentHashMap<>();
+    @Route(method = HttpMethod.GET, uri = "/api-doc")
+    public Result displayDocumentationIndex() {
+        return ok(render(swaggerIndexView, "uris", baseUriMap.keySet()));
+    }
 
     @Route(method = HttpMethod.GET, uri = "/api-doc/{api}")
     public Result displayDocumentation(@PathParameter("api") String api) {
@@ -116,9 +120,9 @@ public final class SwaggerDocController extends DefaultController {
                                 return null;
                             }
                         }).filter(s -> s != null).collect(Collectors.toSet());
-                        ImmutableSet<String> immutableBaseUris = ImmutableSet.of();
+                        ImmutableSet<String> immutableBaseUris = ImmutableSet.copyOf(baseUris);
                         BundleApiDoc apiDoc = new BundleApiDoc(immutableBaseUris, swaggerFile, apiSpecification, bundle);
-                        for (String baseUri : baseUris) {
+                        for (String baseUri : immutableBaseUris) {
                             baseUriMap.put(baseUri, apiDoc);
                         }
                         bundleBaseUris.put(bundle.getSymbolicName(), immutableBaseUris);
