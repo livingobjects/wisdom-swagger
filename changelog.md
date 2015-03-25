@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5
+* First oss sonatype version
+
 ## 1.3
 * Add ASL2 license
 * Update to wisdom 0.7-SNAPSHOT and guava 18
