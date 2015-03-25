@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5
+## 1.6
 * First oss sonatype version
 
 ## 1.3
