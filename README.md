@@ -1,5 +1,6 @@
 wisdom-swagger
 ==============
+[![Build Status](https://api.travis-ci.org/livingobjects/wisdom-swagger.png)](https://travis-ci.org/livingobjects/wisdom-swagger)
 
 A swagger extension for wisdom framework which provides Swagger REST API documentation automatically (<a href="https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md">Swagger spec v2.0</a>).
 For information about supported format see parser : https://github.com/livingobjects/myrddin/blob/develop/README.md
