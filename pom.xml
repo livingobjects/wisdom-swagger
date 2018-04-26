@@ -19,38 +19,6 @@
 
     <packaging>bundle</packaging>
 
-    <dependencies>
-        <!-- WISDOM -->
-        <dependency>
-            <groupId>org.wisdom-framework</groupId>
-            <artifactId>wisdom-api</artifactId>
-            <version>${wisdom.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.livingobjects.myrddin</groupId>
-            <artifactId>myrddin</artifactId>
-            <version>1.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.ipojo</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.ipojo.handler.extender</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
