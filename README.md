@@ -94,7 +94,7 @@ If there is several bundles then /api-doc will return a 409 (HTTP CONFLICT), to 
 
 ```
 components {
-    bundle-api-doc-service {
+    swagger-doc-config {
         defaultBundleName = bundle2
     }
 }

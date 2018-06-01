@@ -1,6 +1,6 @@
 package com.livingobjects.wisdom.swagger.internal.bundledoc;
 
-public @interface BundleApiDocConfig {
+public @interface SwaggerDocConfig {
 
     String defaultBundleName();
 }

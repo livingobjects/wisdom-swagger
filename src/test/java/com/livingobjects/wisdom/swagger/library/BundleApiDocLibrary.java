@@ -1,6 +1,6 @@
 package com.livingobjects.wisdom.swagger.library;
 
-import com.livingobjects.wisdom.swagger.internal.bundledoc.BundleApiDoc;
+import com.livingobjects.wisdom.swagger.internal.bundledoc.SwaggerBundle;
 import org.osgi.framework.Bundle;
 
 import java.net.URL;
@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 public final class BundleApiDocLibrary {
 
-    public static BundleApiDoc bundleApiDocDan() {
+    public static SwaggerBundle bundleApiDocDan() {
         String swaggerFile = SwaggerFileLibrary.swaggerFilePathDan();
         URL swaggerFileUrl = BundleApiDocLibrary.class.getResource(swaggerFile);
 
@@ -18,10 +18,10 @@ public final class BundleApiDocLibrary {
         doReturn("com.architects.dansearle").when(bundleDanMock).getSymbolicName();
         doReturn(swaggerFileUrl).when(bundleDanMock).getResource(swaggerFile);
 
-        return new BundleApiDoc(bundleDanMock, swaggerFile);
+        return new SwaggerBundle(bundleDanMock, swaggerFile);
     }
 
-    public static BundleApiDoc bundleApiDocTom() {
+    public static SwaggerBundle bundleApiDocTom() {
         String swaggerFile = SwaggerFileLibrary.swaggerFilePathTom();
         URL swaggerFileUrl = BundleApiDocLibrary.class.getResource(swaggerFile);
 
@@ -29,6 +29,6 @@ public final class BundleApiDocLibrary {
         doReturn("com.architects.tomsearle").when(bundleTomMock).getSymbolicName();
         doReturn(swaggerFileUrl).when(bundleTomMock).getResource(swaggerFile);
 
-        return new BundleApiDoc(bundleTomMock, swaggerFile);
+        return new SwaggerBundle(bundleTomMock, swaggerFile);
     }
 }

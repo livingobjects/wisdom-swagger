@@ -1,42 +1,35 @@
 package com.livingobjects.wisdom.swagger.internal.bundledoc;
 
-import com.google.common.base.MoreObjects;
 import org.osgi.framework.Bundle;
 
-import java.util.Objects;
+import java.util.Optional;
 
-import static java.util.Objects.requireNonNull;
+public interface BundleApiDoc {
 
-public final class BundleApiDoc {
+    /**
+     * Returns the only {@link SwaggerBundle}.
+     * @return the only {@link SwaggerBundle} if one exists, empty otherwise.
+     */
+    Optional<SwaggerBundle> findSingle();
 
-    public final Bundle bundle;
+    /**
+     * Finds a {@link SwaggerBundle} by a search key.
+     * @param key the search key.
+     * @return the {@link SwaggerBundle} if a bundle is found for the search key, empty otherwise.
+     * @throws IllegalStateException if more than one bundle matches for the search key.
+     */
+    Optional<SwaggerBundle> findByKey(String key);
 
-    public final String swaggerFile;
+    /**
+     * Adds a bundle with its swagger file to the documentation.
+     * @param bundle the bundle to add to the documentation.
+     * @param swaggerFile the swagger file path.
+     */
+    void addBundle(Bundle bundle, String swaggerFile);
 
-    public BundleApiDoc(Bundle bundle, String swaggerFile) {
-        this.swaggerFile = requireNonNull(swaggerFile);
-        this.bundle = requireNonNull(bundle);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BundleApiDoc that = (BundleApiDoc) o;
-        return Objects.equals(bundle, that.bundle) &&
-            Objects.equals(swaggerFile, that.swaggerFile);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(bundle, swaggerFile);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("bundle", bundle)
-            .add("swaggerFile", swaggerFile)
-            .toString();
-    }
+    /**
+     * Removes a bundle from the documentation.
+     * @param bundle the bundle to remove from the documentation.
+     */
+    void removeBundle(Bundle bundle);
 }

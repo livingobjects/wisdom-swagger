@@ -1,7 +1,8 @@
 package com.livingobjects.wisdom.swagger.internal.rest;
 
 import com.livingobjects.wisdom.swagger.internal.bundledoc.BundleApiDoc;
-import com.livingobjects.wisdom.swagger.internal.bundledoc.BundleApiDocService;
+import com.livingobjects.wisdom.swagger.internal.bundledoc.SwaggerBundle;
+import com.livingobjects.wisdom.swagger.internal.bundledoc.SwaggerDocConfigService;
 import com.livingobjects.wisdom.swagger.library.BundleApiDocLibrary;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,20 +23,25 @@ import static org.mockito.Mockito.verify;
 
 public final class SwaggerDocControllerTest extends WisdomUnitTest {
 
-    private BundleApiDocService bundleApiDocServiceMock;
+    private BundleApiDoc bundleApiDocsMock;
+    private SwaggerDocConfigService bundleApiDocConfigServiceMock;
     private SwaggerDocController swaggerDocController;
 
     @Before
     public void setUp() {
-        bundleApiDocServiceMock = mock(BundleApiDocService.class);
+        bundleApiDocsMock = mock(BundleApiDoc.class);
+        bundleApiDocConfigServiceMock = mock(SwaggerDocConfigService.class);
 
         swaggerDocController = new SwaggerDocController();
-        swaggerDocController.setBundleApiDocService(bundleApiDocServiceMock);
+        swaggerDocController.setBundleApiDocService(bundleApiDocsMock);
+        swaggerDocController.setBundleApiDocConfigService(bundleApiDocConfigServiceMock);
     }
 
     @Test
-    public void shouldCallBundleApiDocServiceAndReturnHttpNotFound_whenApiDocDoesntExist() {
-        doReturn(Optional.empty()).when(bundleApiDocServiceMock).findDefault();
+    public void shouldReturnHttpNotFound_whenNoDefaultBundleNameAndNoApiDocExists() {
+        doReturn(null).when(bundleApiDocConfigServiceMock).defaultBundleName();
+
+        doReturn(Optional.empty()).when(bundleApiDocsMock).findSingle();
 
         Action.ActionResult result = Action.action(new Invocation() {
             @Override
@@ -46,16 +52,35 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
 
         assertThat(status(result)).isEqualTo(NOT_FOUND);
 
-        verify(bundleApiDocServiceMock).findDefault();
+        verify(bundleApiDocsMock).findSingle();
     }
 
     @Test
-    public void shouldCallBundleApiDocServiceAndReturnHttpOk_whenApiDocExists() throws Exception {
-        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+    public void shouldReturnHttpNotFound_whenDefaultBundleNameAndNoApiDocExists() {
+        doReturn("default").when(bundleApiDocConfigServiceMock).defaultBundleName();
+
+        doReturn(Optional.empty()).when(bundleApiDocsMock).findByKey("default");
+
+        Action.ActionResult result = Action.action(new Invocation() {
+            @Override
+            public Result invoke() {
+                return swaggerDocController.apiDoc();
+            }
+        }).invoke();
+
+        assertThat(status(result)).isEqualTo(NOT_FOUND);
+
+        verify(bundleApiDocsMock).findByKey("default");
+    }
+
+    @Test
+    public void shouldReturnHttpOk_whenNoDefaultBundleNameAndApiDocExists() throws Exception {
+        doReturn(null).when(bundleApiDocConfigServiceMock).defaultBundleName();
+        SwaggerBundle bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
 
         String expectedApiDoc = new String(Files.readAllBytes(Paths.get(getClass().getResource(bundleApiDoc.swaggerFile).toURI())));
 
-        doReturn(Optional.of(bundleApiDoc)).when(bundleApiDocServiceMock).findDefault();
+        doReturn(Optional.of(bundleApiDoc)).when(bundleApiDocsMock).findSingle();
 
         Action.ActionResult result = Action.action(new Invocation() {
             @Override
@@ -68,14 +93,37 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
         assertThat(contentType(result)).isEqualTo("application/x-yaml");
         assertThat(toString(result)).isEqualTo(expectedApiDoc);
 
-        verify(bundleApiDocServiceMock).findDefault();
+        verify(bundleApiDocsMock).findSingle();
+    }
+
+    @Test
+    public void shouldReturnHttpOk_whenDefaultBundleNameAndApiDocExists() throws Exception {
+        doReturn("default").when(bundleApiDocConfigServiceMock).defaultBundleName();
+        SwaggerBundle bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+
+        String expectedApiDoc = new String(Files.readAllBytes(Paths.get(getClass().getResource(bundleApiDoc.swaggerFile).toURI())));
+
+        doReturn(Optional.of(bundleApiDoc)).when(bundleApiDocsMock).findByKey("default");
+
+        Action.ActionResult result = Action.action(new Invocation() {
+            @Override
+            public Result invoke() {
+                return swaggerDocController.apiDoc();
+            }
+        }).invoke();
+
+        assertThat(status(result)).isEqualTo(OK);
+        assertThat(contentType(result)).isEqualTo("application/x-yaml");
+        assertThat(toString(result)).isEqualTo(expectedApiDoc);
+
+        verify(bundleApiDocsMock).findByKey("default");
     }
 
     @Test
     public void shouldReturnHttpConflict_whenBundleApiDocServiceFindByKeyThrowsIllegalStateException() {
         String key = "tomSearle";
 
-        doThrow(new IllegalStateException()).when(bundleApiDocServiceMock).findByKey(key);
+        doThrow(new IllegalStateException()).when(bundleApiDocsMock).findByKey(key);
 
         Action.ActionResult result = Action.action(new Invocation() {
             @Override
@@ -86,14 +134,14 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
 
         assertThat(status(result)).isEqualTo(CONFLICT);
 
-        verify(bundleApiDocServiceMock).findByKey(key);
+        verify(bundleApiDocsMock).findByKey(key);
     }
 
     @Test
     public void shouldCallBundleApiDocServiceAndReturnHttpNotFound_whenApiDocDoesntExistForKey() {
         String key = "tomSearle";
 
-        doReturn(Optional.empty()).when(bundleApiDocServiceMock).findByKey(key);
+        doReturn(Optional.empty()).when(bundleApiDocsMock).findByKey(key);
 
         Action.ActionResult result = Action.action(new Invocation() {
             @Override
@@ -104,17 +152,17 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
 
         assertThat(status(result)).isEqualTo(NOT_FOUND);
 
-        verify(bundleApiDocServiceMock).findByKey(key);
+        verify(bundleApiDocsMock).findByKey(key);
     }
 
     @Test
     public void shouldCallBundleApiDocServiceAndReturnHttpOK_whenApiDocExistsForKey() throws Exception {
         String key = "tomSearle";
-        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+        SwaggerBundle bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
 
         String expectedApiDoc = new String(Files.readAllBytes(Paths.get(getClass().getResource(bundleApiDoc.swaggerFile).toURI())));
 
-        doReturn(Optional.of(bundleApiDoc)).when(bundleApiDocServiceMock).findByKey(key);
+        doReturn(Optional.of(bundleApiDoc)).when(bundleApiDocsMock).findByKey(key);
 
         Action.ActionResult result = Action.action(new Invocation() {
             @Override
@@ -127,24 +175,24 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
         assertThat(contentType(result)).isEqualTo("application/x-yaml");
         assertThat(toString(result)).isEqualTo(expectedApiDoc);
 
-        verify(bundleApiDocServiceMock).findByKey(key);
+        verify(bundleApiDocsMock).findByKey(key);
     }
 
-//    @Test
-//    public void shouldCallBundleApiDocServiceAdd_onBundleArrival() {
-//        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
-//
-//        swaggerDocController.onBundleArrival(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
-//
-//        verify(bundleApiDocServiceMock).addBundle(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
-//    }
-//
-//    @Test
-//    public void shouldCallBundleApiDocServiceRemove_onBundleDeparture() {
-//        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
-//
-//        swaggerDocController.onBundleDeparture(bundleApiDoc.bundle);
-//
-//        verify(bundleApiDocServiceMock).removeBundle(bundleApiDoc.bundle);
-//    }
+    @Test
+    public void shouldCallBundleApiDocServiceAdd_onBundleArrival() {
+        SwaggerBundle bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+
+        swaggerDocController.onBundleArrival(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
+
+        verify(bundleApiDocsMock).addBundle(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
+    }
+
+    @Test
+    public void shouldCallBundleApiDocServiceRemove_onBundleDeparture() {
+        SwaggerBundle bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+
+        swaggerDocController.onBundleDeparture(bundleApiDoc.bundle);
+
+        verify(bundleApiDocsMock).removeBundle(bundleApiDoc.bundle);
+    }
 }

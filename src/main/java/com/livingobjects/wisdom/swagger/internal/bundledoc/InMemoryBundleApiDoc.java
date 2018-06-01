@@ -1,10 +1,7 @@
 package com.livingobjects.wisdom.swagger.internal.bundledoc;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import org.osgi.framework.Bundle;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,44 +13,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.stream.Collectors.toSet;
 
-@Component(name = BundleApiDocServiceImpl.NAME, immediate = true)
-public final class BundleApiDocServiceImpl implements BundleApiDocService {
+public final class InMemoryBundleApiDoc implements BundleApiDoc {
 
-    public static final String NAME = "bundle-api-doc-service";
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryBundleApiDoc.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleApiDocServiceImpl.class);
-
-    private final ConcurrentHashMap<String, BundleApiDoc> bundleApiDocByName = new ConcurrentHashMap<>();
-
-    private String defaultBundleName = null;
-
-    @Activate
-    public void activate(BundleApiDocConfig config) {
-        defaultBundleName = config.defaultBundleName();
-
-        if (!Strings.isNullOrEmpty(defaultBundleName)) {
-            LOGGER.info("The default bundle for api doc is {}", defaultBundleName);
-        }
-    }
+    private final ConcurrentHashMap<String, SwaggerBundle> bundleApiDocByName = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<BundleApiDoc> findDefault() {
-        if (bundleApiDocByName.isEmpty()) {
+    public Optional<SwaggerBundle> findSingle() {
+        if (bundleApiDocByName.size() != 1) {
             return Optional.empty();
-        } else if (bundleApiDocByName.size() == 1) {
-            String onlyBundleName = Iterables.getOnlyElement(bundleApiDocByName.keySet());
-            return Optional.of(bundleApiDocByName.get(onlyBundleName));
         }
 
-        if (!Strings.isNullOrEmpty(defaultBundleName)) {
-            return findByKey(defaultBundleName);
-        }
-
-        return Optional.empty();
+        String onlyBundleName = Iterables.getOnlyElement(bundleApiDocByName.keySet());
+        return Optional.of(bundleApiDocByName.get(onlyBundleName));
     }
 
     @Override
-    public Optional<BundleApiDoc> findByKey(String key) {
+    public Optional<SwaggerBundle> findByKey(String key) {
         Optional<String> bundleName = findBundleNameByKey(key);
 
         if (!bundleName.isPresent() || !bundleApiDocByName.containsKey(bundleName.get())) {
@@ -84,7 +61,7 @@ public final class BundleApiDocServiceImpl implements BundleApiDocService {
         try {
             try (InputStream in = bundle.getResource(swaggerFile).openStream()) {
                 if (in != null) {
-                    BundleApiDoc apiDoc = new BundleApiDoc(bundle, swaggerFile);
+                    SwaggerBundle apiDoc = new SwaggerBundle(bundle, swaggerFile);
                     bundleApiDocByName.put(bundleName, apiDoc);
 
                     LOGGER.info("Added Swagger documentation of bundle '{}'", bundleName);
