@@ -130,21 +130,21 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
         verify(bundleApiDocServiceMock).findByKey(key);
     }
 
-    @Test
-    public void shouldCallBundleApiDocServiceAdd_onBundleArrival() {
-        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
-
-        swaggerDocController.onBundleArrival(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
-
-        verify(bundleApiDocServiceMock).addBundle(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
-    }
-
-    @Test
-    public void shouldCallBundleApiDocServiceRemove_onBundleDeparture() {
-        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
-
-        swaggerDocController.onBundleDeparture(bundleApiDoc.bundle);
-
-        verify(bundleApiDocServiceMock).removeBundle(bundleApiDoc.bundle);
-    }
+//    @Test
+//    public void shouldCallBundleApiDocServiceAdd_onBundleArrival() {
+//        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+//
+//        swaggerDocController.onBundleArrival(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
+//
+//        verify(bundleApiDocServiceMock).addBundle(bundleApiDoc.bundle, bundleApiDoc.swaggerFile);
+//    }
+//
+//    @Test
+//    public void shouldCallBundleApiDocServiceRemove_onBundleDeparture() {
+//        BundleApiDoc bundleApiDoc = BundleApiDocLibrary.bundleApiDocTom();
+//
+//        swaggerDocController.onBundleDeparture(bundleApiDoc.bundle);
+//
+//        verify(bundleApiDocServiceMock).removeBundle(bundleApiDoc.bundle);
+//    }
 }

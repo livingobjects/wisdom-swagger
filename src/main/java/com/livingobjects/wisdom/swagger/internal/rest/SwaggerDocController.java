@@ -27,6 +27,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.extender.Extender;
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wisdom.api.DefaultController;
 import org.wisdom.api.annotations.Controller;
 import org.wisdom.api.annotations.PathParameter;
@@ -47,6 +49,7 @@ import java.net.URL;
 @Controller
 public final class SwaggerDocController extends DefaultController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerDocController.class);
     private static final String YAML_MIME_TYPE = "application/x-yaml";
 
     @Requires
@@ -94,6 +97,7 @@ public final class SwaggerDocController extends DefaultController {
      * @param swaggerFile The swaggerFile path in the manifest.
      */
     void onBundleArrival(Bundle bundle, String swaggerFile) {
+        LOGGER.info("Detected bundle arrival : {}", BundleUtils.nameOf(bundle));
         bundleApiDocService.addBundle(bundle, swaggerFile);
     }
 
@@ -102,6 +106,7 @@ public final class SwaggerDocController extends DefaultController {
      * @param bundle The unloaded bundle.
      */
     void onBundleDeparture(Bundle bundle) {
+        LOGGER.info("Detected bundle departure : {}", BundleUtils.nameOf(bundle));
         bundleApiDocService.removeBundle(bundle);
     }
 
