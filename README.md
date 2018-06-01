@@ -29,13 +29,13 @@ mvn clean install
 To deploy to your local repository use "altDeploymentRepository" option like this :
 
 ```shell
-mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/snapshots
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/repository/snapshots
 ```
 
 Or to deploy a release:
 
 ```shell
-mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/content/repositories/releases
+mvn deploy -DaltDeploymentRepository=nexus::default::http://xxx.xx.xx.xx:8081/nexus/repository/releases
 ```
 
 ## How to use

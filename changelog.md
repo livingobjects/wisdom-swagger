@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7
+* Added [Swagger UI](https://github.com/swagger-api/swagger-ui)
+* Support for [OpenApi 3 specification](https://github.com/OAI/OpenAPI-Specification)
+
 ## 1.6
 * First oss sonatype version
 
