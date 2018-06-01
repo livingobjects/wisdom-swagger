@@ -77,12 +77,13 @@ src/main/resources/swagger/api.yaml
 
 Lets assume wisdom is running on port 9000, then :
 
-- The follow routes will be served :
-*(application/x-yaml) http://localhost:9000/api-doc => will serve the default bundle OpenApi doc to display (see default bundle section below)
-*(application/x-yaml)http://localhost:9000/api-doc/bundle1 => will serve the OpenApi doc defined in bundle1
-*(application/x-yaml)http://localhost:9000/api-doc/bundle2 => will serve the OpenApi doc defined in bundle1
+The follow routes will be served :
 
-- Swagger UI will be displayed on http://localhost:9000/assets/doc/index.html
+- (application/x-yaml) http://localhost:9000/api-doc : will serve the default bundle OpenApi doc to display (see default bundle section below)
+- (application/x-yaml)http://localhost:9000/api-doc/bundle1 : will serve the OpenApi doc defined in bundle1
+- (application/x-yaml)http://localhost:9000/api-doc/bundle2 : will serve the OpenApi doc defined in bundle1
+
+Swagger UI will be displayed on http://localhost:9000/assets/doc/index.html
 Swagger UI will try to request by default the /api-doc endpoint, but you can put /api-doc/bundle1 in the search bar and it will display
 the OpenApi doc of the corresponding bundle.
 
