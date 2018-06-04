@@ -59,11 +59,11 @@ public final class SwaggerDocController extends DefaultController {
     @Requires
     private SwaggerDocConfigService bundleApiDocConfigService;
 
-    private BundleApiDoc bundleApiDocService;
+    private BundleApiDoc bundleApiDoc;
 
     public SwaggerDocController() {
         // We want bundleApiDocService to be a POJO and not a dynamic service, because it needs to have the same lifecycle as the controller
-        this.bundleApiDocService = new InMemoryBundleApiDoc();
+        this.bundleApiDoc = new InMemoryBundleApiDoc();
     }
 
     @Route(method = HttpMethod.GET, uri = "/api-doc")
@@ -71,8 +71,8 @@ public final class SwaggerDocController extends DefaultController {
         String defaultBundleName = bundleApiDocConfigService.defaultBundleName();
         Optional<SwaggerBundle> bundle =
             Strings.isNullOrEmpty(defaultBundleName) ?
-                bundleApiDocService.findSingle() :
-                bundleApiDocService.findByKey(defaultBundleName);
+                bundleApiDoc.findSingle() :
+                bundleApiDoc.findByKey(defaultBundleName);
 
         return bundle
             .map(this::renderAsYaml)
@@ -82,7 +82,7 @@ public final class SwaggerDocController extends DefaultController {
     @Route(method = HttpMethod.GET, uri = "/api-doc/{key}")
     public Result apiDocByKey(@PathParameter("key") String key) {
         try {
-            return bundleApiDocService.findByKey(key)
+            return bundleApiDoc.findByKey(key)
                 .map(this::renderAsYaml)
                 .orElse(notFound());
         } catch (IllegalStateException e) {
@@ -116,7 +116,7 @@ public final class SwaggerDocController extends DefaultController {
      */
     void onBundleArrival(Bundle bundle, String swaggerFile) {
         LOGGER.info("Detected bundle arrival : {}", BundleUtils.nameOf(bundle));
-        bundleApiDocService.addBundle(bundle, swaggerFile);
+        bundleApiDoc.addBundle(bundle, swaggerFile);
     }
 
     /**
@@ -126,12 +126,12 @@ public final class SwaggerDocController extends DefaultController {
      */
     void onBundleDeparture(Bundle bundle) {
         LOGGER.info("Detected bundle departure : {}", BundleUtils.nameOf(bundle));
-        bundleApiDocService.removeBundle(bundle);
+        bundleApiDoc.removeBundle(bundle);
     }
 
     @VisibleForTesting
-    void setBundleApiDocService(BundleApiDoc bundleApiDocs) {
-        this.bundleApiDocService = bundleApiDocs;
+    void setBundleApiDoc(BundleApiDoc bundleApiDocs) {
+        this.bundleApiDoc = bundleApiDocs;
     }
 
     @VisibleForTesting

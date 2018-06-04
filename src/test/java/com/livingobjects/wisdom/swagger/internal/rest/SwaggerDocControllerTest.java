@@ -33,7 +33,7 @@ public final class SwaggerDocControllerTest extends WisdomUnitTest {
         bundleApiDocConfigServiceMock = mock(SwaggerDocConfigService.class);
 
         swaggerDocController = new SwaggerDocController();
-        swaggerDocController.setBundleApiDocService(bundleApiDocsMock);
+        swaggerDocController.setBundleApiDoc(bundleApiDocsMock);
         swaggerDocController.setBundleApiDocConfigService(bundleApiDocConfigServiceMock);
     }
 
